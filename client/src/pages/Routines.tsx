@@ -4,7 +4,7 @@ import { api } from "../lib/api";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../lib/utils";
 import ExerciseLibrary from "../components/ExerciseLibrary";
 
-interface Exercise { id: number; name: string; category: string; xpReward: number; }
+interface Exercise { id: number; name: string; category: string; type: string; xpReward: number; userId?: number | null; muscleGroups?: string[]; }
 interface RoutineExercise { exerciseId: number; sets: number; reps: number; weight: number; restSeconds: number; }
 
 export default function Routines() {

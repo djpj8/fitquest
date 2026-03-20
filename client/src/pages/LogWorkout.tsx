@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../lib/api";
 import ExerciseLibrary from "../components/ExerciseLibrary";
 
-interface Exercise { id: number; name: string; category: string; xpReward: number; }
+interface Exercise { id: number; name: string; category: string; type: string; xpReward: number; userId?: number | null; muscleGroups?: string[]; }
 interface SetEntry { reps: number; weight: number; completed: boolean; }
 interface WorkoutExercise { exercise: Exercise; sets: SetEntry[]; }
 
