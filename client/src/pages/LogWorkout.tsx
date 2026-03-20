@@ -16,17 +16,9 @@ export default function LogWorkout({ onNavigate }: { onNavigate: (p: string) => 
 
   const [workoutName, setWorkoutName] = useState(`Quest — ${new Date().toLocaleDateString("en", { month: "short", day: "numeric" })}`);
   const [workoutExercises, setWorkoutExercises] = useState<WorkoutExercise[]>([]);
-  const [search, setSearch] = useState("");
-  const [filterCat, setFilterCat] = useState("all");
   const [startTime] = useState(Date.now());
   const [result, setResult] = useState<XPResult | null>(null);
   const [notes, setNotes] = useState("");
-
-  const categories = ["all", ...Array.from(new Set(exercises.map(e => e.category)))];
-  const filtered = exercises.filter(e =>
-    (filterCat === "all" || e.category === filterCat) &&
-    e.name.toLowerCase().includes(search.toLowerCase())
-  );
 
   const addExercise = (ex: Exercise) => {
     if (workoutExercises.find(w => w.exercise.id === ex.id)) return;
