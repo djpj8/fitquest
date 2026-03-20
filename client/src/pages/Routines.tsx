@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../lib/api";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../lib/utils";
+import ExerciseLibrary from "../components/ExerciseLibrary";
 
 interface Exercise { id: number; name: string; category: string; xpReward: number; }
 interface RoutineExercise { exerciseId: number; sets: number; reps: number; weight: number; restSeconds: number; }
@@ -124,31 +125,13 @@ export default function Routines() {
             </button>
           </div>
 
-          <div className="rpg-card p-4">
-            <h2 className="text-lg mb-3" style={{ fontFamily: "var(--font-serif)" }}>Exercise Library</h2>
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..."
-              className="w-full px-3 py-2 rounded-lg text-sm outline-none mb-3"
-              style={{ background: "hsl(var(--input))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }}
-            />
-            <div className="space-y-1 max-h-[500px] overflow-y-auto">
-              {filteredEx.map(ex => (
-                <button key={ex.id} onClick={() => addExToRoutine(ex)}
-                  disabled={!!form.exercises.find(e => e.exerciseId === ex.id)}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all"
-                  style={{
-                    background: form.exercises.find(e => e.exerciseId === ex.id) ? "hsl(43 85% 20% / 0.3)" : "hsl(var(--muted))",
-                    border: form.exercises.find(e => e.exerciseId === ex.id) ? "1px solid hsl(43 85% 35%)" : "1px solid transparent",
-                    opacity: form.exercises.find(e => e.exerciseId === ex.id) ? 0.6 : 1,
-                  }}>
-                  <span>{CATEGORY_ICONS[ex.category]}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm truncate">{ex.name}</div>
-                    <div className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>{ex.category}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
+
+          <ExerciseLibrary
+            onSelect={addExToRoutine}
+            selectedIds={form.exercises.map(e => e.exerciseId)}
+            showSelectButton={true}
+          />
+
         </div>
       </div>
     );

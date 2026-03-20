@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../lib/api";
-import { CATEGORY_COLORS, CATEGORY_ICONS } from "../lib/utils";
+import ExerciseLibrary from "../components/ExerciseLibrary";
 
 interface Exercise { id: number; name: string; category: string; xpReward: number; }
 interface SetEntry { reps: number; weight: number; completed: boolean; }
@@ -274,52 +274,11 @@ export default function LogWorkout({ onNavigate }: { onNavigate: (p: string) => 
         </div>
 
         {/* Right: exercise browser */}
-        <div className="rpg-card p-4">
-          <h2 className="text-lg mb-3" style={{ fontFamily: "var(--font-serif)" }}>📚 Exercise Library</h2>
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search exercises..."
-            className="w-full px-3 py-2 rounded-lg text-sm outline-none mb-3"
-            style={{ background: "hsl(var(--input))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }}
-          />
-
-          <div className="flex gap-1 flex-wrap mb-3">
-            {categories.map(cat => (
-              <button key={cat} onClick={() => setFilterCat(cat)}
-                className="px-2 py-1 rounded-full text-xs capitalize transition-all"
-                style={{
-                  background: filterCat === cat ? "hsl(var(--primary))" : "hsl(var(--muted))",
-                  color: filterCat === cat ? "hsl(var(--primary-foreground))" : "hsl(var(--muted-foreground))",
-                }}>
-                {cat === "all" ? "All" : `${CATEGORY_ICONS[cat] || ""} ${cat}`}
-              </button>
-            ))}
-          </div>
-
-          <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-            {filtered.map(ex => (
-              <button key={ex.id} onClick={() => addExercise(ex)}
-                disabled={!!workoutExercises.find(w => w.exercise.id === ex.id)}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all"
-                style={{
-                  background: workoutExercises.find(w => w.exercise.id === ex.id) ? "hsl(43 85% 20% / 0.3)" : "hsl(var(--muted))",
-                  border: workoutExercises.find(w => w.exercise.id === ex.id) ? "1px solid hsl(43 85% 35%)" : "1px solid hsl(var(--border))",
-                  opacity: workoutExercises.find(w => w.exercise.id === ex.id) ? 0.6 : 1,
-                  cursor: workoutExercises.find(w => w.exercise.id === ex.id) ? "default" : "pointer",
-                }}>
-                <span>{CATEGORY_ICONS[ex.category]}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium truncate">{ex.name}</div>
-                  <div className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>{ex.category}</div>
-                </div>
-                <span className="text-xs" style={{ fontFamily: "var(--font-mono)", color: "hsl(160 60% 50%)" }}>
-                  +{ex.xpReward}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
+        <ExerciseLibrary
+          onSelect={addExercise}
+          selectedIds={workoutExercises.map(w => w.exercise.id)}
+          showSelectButton={true}
+        />
       </div>
     </div>
   );
