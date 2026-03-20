@@ -23,6 +23,7 @@ export function useAuth() {
     queryKey: ["me"],
     queryFn: () => api.get<UserProfile>("/auth/me").then((r: any) => r.user),
     retry: false,
+    staleTime: 0,
   });
 
   const loginMutation = useMutation({
