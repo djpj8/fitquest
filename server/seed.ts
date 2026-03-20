@@ -121,13 +121,26 @@ const seedAchievements = [
 ];
 
 export async function seed() {
-  console.log("Seeding exercises...");
-  for (const ex of seedExercises) {
-    await db.insert(exercises).values(ex).onConflictDoNothing();
+  // Only seed if tables are empty
+  const existingExercises = await db.select().from(exercises).limit(1);
+  if (existingExercises.length === 0) {
+    console.log("Seeding exercises...");
+    for (const ex of seedExercises) {
+      await db.insert(exercises).values(ex);
+    }
+  } else {
+    console.log("Exercises already seeded, skipping.");
   }
-  console.log("Seeding achievements...");
-  for (const ach of seedAchievements) {
-    await db.insert(achievements).values(ach).onConflictDoNothing();
+
+  const existingAchievements = await db.select().from(achievements).limit(1);
+  if (existingAchievements.length === 0) {
+    console.log("Seeding achievements...");
+    for (const ach of seedAchievements) {
+      await db.insert(achievements).values(ach);
+    }
+  } else {
+    console.log("Achievements already seeded, skipping.");
   }
+
   console.log("Seed complete!");
 }
