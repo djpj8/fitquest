@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import { storage, getLevelFromTotalXp, xpForLevel } from "./storage";
+import { storage, getLevelFromTotalXp, xpForLevel, exerciseStorage } from "./storage";
 import { requireAuth, hashPassword } from "./auth";
 import { insertUserSchema, insertProgramSchema, insertRoutineSchema, insertWorkoutLogSchema } from "../shared/schema";
 import { z } from "zod";
@@ -64,8 +64,43 @@ router.get("/auth/me", requireAuth, async (req: Request, res: Response) => {
 // ─── Exercises ───────────────────────────────────────────────────────────────
 
 router.get("/exercises", requireAuth, async (req: Request, res: Response) => {
-  const list = await storage.getExercises();
+  const list = await exerciseStorage.getExercises(req.session.userId!);
   res.json(list);
+});
+
+router.post("/exercises", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { name, category, type, muscleGroups, description } = req.body;
+    if (!name || !category) return res.status(400).json({ error: "Name and category required" });
+    const ex = await exerciseStorage.createCustomExercise({
+      name, category,
+      type: type || "gym",
+      muscleGroups: muscleGroups || [],
+      description: description || null,
+      xpReward: 12,
+      userId: req.session.userId!,
+    });
+    res.json(ex);
+  } catch (e: any) {
+    res.status(400).json({ error: e.message });
+  }
+});
+
+router.delete("/exercises/:id", requireAuth, async (req: Request, res: Response) => {
+  await exerciseStorage.deleteCustomExercise(Number(req.params.id), req.session.userId!);
+  res.json({ ok: true });
+});
+
+// ─── Favorites ────────────────────────────────────────────────────────────────
+
+router.get("/exercises/favorites", requireAuth, async (req: Request, res: Response) => {
+  const list = await exerciseStorage.getFavorites(req.session.userId!);
+  res.json(list);
+});
+
+router.post("/exercises/:id/favorite", requireAuth, async (req: Request, res: Response) => {
+  const isFav = await exerciseStorage.toggleFavorite(req.session.userId!, Number(req.params.id));
+  res.json({ favorited: isFav });
 });
 
 // ─── Programs ────────────────────────────────────────────────────────────────

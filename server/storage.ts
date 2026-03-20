@@ -1,7 +1,7 @@
-import { eq, desc, and, sql } from "drizzle-orm";
+import { eq, desc, and, sql, or, isNull } from "drizzle-orm";
 import { db } from "./db";
 import {
-  users, exercises, programs, routines, workoutLogs, achievements, userAchievements,
+  users, exercises, programs, routines, workoutLogs, achievements, userAchievements, favoriteExercises,
   type User, type Exercise, type Program, type Routine, type WorkoutLog,
   type Achievement, type UserAchievement, type InsertUser, type InsertProgram,
   type InsertRoutine, type InsertWorkoutLog,
@@ -188,5 +188,48 @@ export const storage = {
       }
     }
     return unlocked;
+  },
+};
+
+// ─── Custom Exercises ──────────────────────────────────────────────────────────
+export const exerciseStorage = {
+  async getExercises(userId: number): Promise<any[]> {
+    return db.select().from(exercises)
+      .where(or(isNull(exercises.userId), eq(exercises.userId, userId)))
+      .orderBy(exercises.name);
+  },
+  async createCustomExercise(data: any): Promise<any> {
+    const [ex] = await db.insert(exercises).values(data).returning();
+    return ex;
+  },
+  async deleteCustomExercise(id: number, userId: number): Promise<void> {
+    await db.delete(exercises)
+      .where(and(eq(exercises.id, id), eq(exercises.userId, userId)));
+  },
+
+  // ─── Favorites ────────────────────────────────────────────────────────────────
+  async getFavorites(userId: number): Promise<any[]> {
+    return db.select({ ...exercises })
+      .from(favoriteExercises)
+      .innerJoin(exercises, eq(favoriteExercises.exerciseId, exercises.id))
+      .where(eq(favoriteExercises.userId, userId))
+      .orderBy(exercises.name);
+  },
+  async toggleFavorite(userId: number, exerciseId: number): Promise<boolean> {
+    const existing = await db.select().from(favoriteExercises)
+      .where(and(eq(favoriteExercises.userId, userId), eq(favoriteExercises.exerciseId, exerciseId)));
+    if (existing.length > 0) {
+      await db.delete(favoriteExercises)
+        .where(and(eq(favoriteExercises.userId, userId), eq(favoriteExercises.exerciseId, exerciseId)));
+      return false;
+    } else {
+      await db.insert(favoriteExercises).values({ userId, exerciseId });
+      return true;
+    }
+  },
+  async isFavorite(userId: number, exerciseId: number): Promise<boolean> {
+    const res = await db.select().from(favoriteExercises)
+      .where(and(eq(favoriteExercises.userId, userId), eq(favoriteExercises.exerciseId, exerciseId)));
+    return res.length > 0;
   },
 };

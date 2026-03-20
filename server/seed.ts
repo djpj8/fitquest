@@ -2,46 +2,112 @@ import { db } from "./db";
 import { exercises, achievements } from "../shared/schema";
 
 const seedExercises = [
-  // Chest
-  { name: "Bench Press", category: "chest", muscleGroups: ["pectorals", "triceps", "front deltoid"], xpReward: 15 },
-  { name: "Incline Bench Press", category: "chest", muscleGroups: ["upper pectorals", "triceps"], xpReward: 15 },
-  { name: "Push-Up", category: "chest", muscleGroups: ["pectorals", "triceps", "core"], xpReward: 8 },
-  { name: "Dumbbell Fly", category: "chest", muscleGroups: ["pectorals"], xpReward: 12 },
-  { name: "Cable Crossover", category: "chest", muscleGroups: ["pectorals"], xpReward: 12 },
-  // Back
-  { name: "Pull-Up", category: "back", muscleGroups: ["lats", "biceps", "rhomboids"], xpReward: 15 },
-  { name: "Barbell Row", category: "back", muscleGroups: ["lats", "rhomboids", "biceps"], xpReward: 15 },
-  { name: "Lat Pulldown", category: "back", muscleGroups: ["lats", "biceps"], xpReward: 12 },
-  { name: "Seated Cable Row", category: "back", muscleGroups: ["rhomboids", "lats", "biceps"], xpReward: 12 },
-  { name: "Deadlift", category: "back", muscleGroups: ["lower back", "glutes", "hamstrings", "lats"], xpReward: 20 },
-  // Legs
-  { name: "Squat", category: "legs", muscleGroups: ["quadriceps", "glutes", "hamstrings"], xpReward: 20 },
-  { name: "Romanian Deadlift", category: "legs", muscleGroups: ["hamstrings", "glutes"], xpReward: 15 },
-  { name: "Leg Press", category: "legs", muscleGroups: ["quadriceps", "glutes"], xpReward: 15 },
-  { name: "Lunges", category: "legs", muscleGroups: ["quadriceps", "glutes", "hamstrings"], xpReward: 12 },
-  { name: "Leg Curl", category: "legs", muscleGroups: ["hamstrings"], xpReward: 10 },
-  { name: "Calf Raise", category: "legs", muscleGroups: ["calves"], xpReward: 8 },
-  // Shoulders
-  { name: "Overhead Press", category: "shoulders", muscleGroups: ["deltoids", "triceps"], xpReward: 15 },
-  { name: "Lateral Raise", category: "shoulders", muscleGroups: ["lateral deltoid"], xpReward: 10 },
-  { name: "Face Pull", category: "shoulders", muscleGroups: ["rear deltoid", "rotator cuff"], xpReward: 10 },
-  { name: "Arnold Press", category: "shoulders", muscleGroups: ["deltoids", "triceps"], xpReward: 12 },
-  // Arms
-  { name: "Barbell Curl", category: "arms", muscleGroups: ["biceps"], xpReward: 10 },
-  { name: "Hammer Curl", category: "arms", muscleGroups: ["biceps", "brachialis"], xpReward: 10 },
-  { name: "Tricep Pushdown", category: "arms", muscleGroups: ["triceps"], xpReward: 10 },
-  { name: "Skull Crusher", category: "arms", muscleGroups: ["triceps"], xpReward: 12 },
-  { name: "Preacher Curl", category: "arms", muscleGroups: ["biceps"], xpReward: 10 },
-  // Core
-  { name: "Plank", category: "core", muscleGroups: ["core", "lower back"], xpReward: 8 },
-  { name: "Crunch", category: "core", muscleGroups: ["abs"], xpReward: 6 },
-  { name: "Leg Raise", category: "core", muscleGroups: ["lower abs", "hip flexors"], xpReward: 8 },
-  { name: "Russian Twist", category: "core", muscleGroups: ["obliques", "abs"], xpReward: 8 },
-  // Cardio
-  { name: "Running", category: "cardio", muscleGroups: ["cardiovascular", "legs"], xpReward: 12 },
-  { name: "Cycling", category: "cardio", muscleGroups: ["cardiovascular", "legs"], xpReward: 10 },
-  { name: "Jump Rope", category: "cardio", muscleGroups: ["cardiovascular", "calves"], xpReward: 10 },
-  { name: "Rowing Machine", category: "cardio", muscleGroups: ["cardiovascular", "back", "arms"], xpReward: 12 },
+  // ── GYM: Chest ──
+  { name: "Bench Press", category: "chest", type: "gym", muscleGroups: ["pectorals", "triceps", "front deltoid"], xpReward: 15 },
+  { name: "Incline Bench Press", category: "chest", type: "gym", muscleGroups: ["upper pectorals", "triceps"], xpReward: 15 },
+  { name: "Dumbbell Fly", category: "chest", type: "gym", muscleGroups: ["pectorals"], xpReward: 12 },
+  { name: "Cable Crossover", category: "chest", type: "gym", muscleGroups: ["pectorals"], xpReward: 12 },
+  { name: "Pec Deck", category: "chest", type: "gym", muscleGroups: ["pectorals"], xpReward: 10 },
+  // ── GYM: Back ──
+  { name: "Barbell Row", category: "back", type: "gym", muscleGroups: ["lats", "rhomboids", "biceps"], xpReward: 15 },
+  { name: "Lat Pulldown", category: "back", type: "gym", muscleGroups: ["lats", "biceps"], xpReward: 12 },
+  { name: "Seated Cable Row", category: "back", type: "gym", muscleGroups: ["rhomboids", "lats"], xpReward: 12 },
+  { name: "Deadlift", category: "back", type: "gym", muscleGroups: ["lower back", "glutes", "hamstrings", "lats"], xpReward: 20 },
+  { name: "T-Bar Row", category: "back", type: "gym", muscleGroups: ["lats", "rhomboids"], xpReward: 14 },
+  // ── GYM: Legs ──
+  { name: "Squat", category: "legs", type: "gym", muscleGroups: ["quadriceps", "glutes", "hamstrings"], xpReward: 20 },
+  { name: "Romanian Deadlift", category: "legs", type: "gym", muscleGroups: ["hamstrings", "glutes"], xpReward: 15 },
+  { name: "Leg Press", category: "legs", type: "gym", muscleGroups: ["quadriceps", "glutes"], xpReward: 15 },
+  { name: "Leg Curl", category: "legs", type: "gym", muscleGroups: ["hamstrings"], xpReward: 10 },
+  { name: "Leg Extension", category: "legs", type: "gym", muscleGroups: ["quadriceps"], xpReward: 10 },
+  { name: "Calf Raise", category: "legs", type: "gym", muscleGroups: ["calves"], xpReward: 8 },
+  { name: "Hip Thrust", category: "legs", type: "gym", muscleGroups: ["glutes", "hamstrings"], xpReward: 14 },
+  // ── GYM: Shoulders ──
+  { name: "Overhead Press", category: "shoulders", type: "gym", muscleGroups: ["deltoids", "triceps"], xpReward: 15 },
+  { name: "Lateral Raise", category: "shoulders", type: "gym", muscleGroups: ["lateral deltoid"], xpReward: 10 },
+  { name: "Face Pull", category: "shoulders", type: "gym", muscleGroups: ["rear deltoid", "rotator cuff"], xpReward: 10 },
+  { name: "Arnold Press", category: "shoulders", type: "gym", muscleGroups: ["deltoids", "triceps"], xpReward: 12 },
+  { name: "Rear Delt Fly", category: "shoulders", type: "gym", muscleGroups: ["rear deltoid"], xpReward: 10 },
+  // ── GYM: Arms ──
+  { name: "Barbell Curl", category: "arms", type: "gym", muscleGroups: ["biceps"], xpReward: 10 },
+  { name: "Hammer Curl", category: "arms", type: "gym", muscleGroups: ["biceps", "brachialis"], xpReward: 10 },
+  { name: "Tricep Pushdown", category: "arms", type: "gym", muscleGroups: ["triceps"], xpReward: 10 },
+  { name: "Skull Crusher", category: "arms", type: "gym", muscleGroups: ["triceps"], xpReward: 12 },
+  { name: "Preacher Curl", category: "arms", type: "gym", muscleGroups: ["biceps"], xpReward: 10 },
+  { name: "Cable Curl", category: "arms", type: "gym", muscleGroups: ["biceps"], xpReward: 10 },
+  // ── GYM: Core ──
+  { name: "Cable Crunch", category: "core", type: "gym", muscleGroups: ["abs"], xpReward: 10 },
+  { name: "Ab Wheel Rollout", category: "core", type: "gym", muscleGroups: ["abs", "core"], xpReward: 14 },
+  // ── GYM: Cardio ──
+  { name: "Treadmill Run", category: "cardio", type: "gym", muscleGroups: ["cardiovascular", "legs"], xpReward: 12 },
+  { name: "Cycling", category: "cardio", type: "gym", muscleGroups: ["cardiovascular", "legs"], xpReward: 10 },
+  { name: "Rowing Machine", category: "cardio", type: "gym", muscleGroups: ["cardiovascular", "back", "arms"], xpReward: 12 },
+  { name: "Stairmaster", category: "cardio", type: "gym", muscleGroups: ["cardiovascular", "legs", "glutes"], xpReward: 12 },
+  { name: "Elliptical", category: "cardio", type: "gym", muscleGroups: ["cardiovascular", "full body"], xpReward: 10 },
+
+  // ── CALISTHENICS: Chest ──
+  { name: "Push-Up", category: "chest", type: "calisthenics", muscleGroups: ["pectorals", "triceps", "core"], xpReward: 8 },
+  { name: "Wide Push-Up", category: "chest", type: "calisthenics", muscleGroups: ["pectorals"], xpReward: 8 },
+  { name: "Diamond Push-Up", category: "chest", type: "calisthenics", muscleGroups: ["triceps", "inner pectorals"], xpReward: 10 },
+  { name: "Archer Push-Up", category: "chest", type: "calisthenics", muscleGroups: ["pectorals", "triceps"], xpReward: 14 },
+  { name: "Pike Push-Up", category: "chest", type: "calisthenics", muscleGroups: ["shoulders", "triceps"], xpReward: 10 },
+  { name: "Pseudo Planche Push-Up", category: "chest", type: "calisthenics", muscleGroups: ["pectorals", "shoulders", "core"], xpReward: 16 },
+  { name: "Ring Push-Up", category: "chest", type: "calisthenics", muscleGroups: ["pectorals", "stabilizers"], xpReward: 12 },
+  // ── CALISTHENICS: Back ──
+  { name: "Pull-Up", category: "back", type: "calisthenics", muscleGroups: ["lats", "biceps", "rhomboids"], xpReward: 15 },
+  { name: "Chin-Up", category: "back", type: "calisthenics", muscleGroups: ["biceps", "lats"], xpReward: 14 },
+  { name: "Neutral Grip Pull-Up", category: "back", type: "calisthenics", muscleGroups: ["lats", "biceps"], xpReward: 14 },
+  { name: "Inverted Row", category: "back", type: "calisthenics", muscleGroups: ["rhomboids", "lats", "biceps"], xpReward: 12 },
+  { name: "Australian Pull-Up", category: "back", type: "calisthenics", muscleGroups: ["lats", "rhomboids"], xpReward: 10 },
+  { name: "Muscle-Up", category: "back", type: "calisthenics", muscleGroups: ["lats", "triceps", "chest"], xpReward: 25 },
+  { name: "Front Lever Row", category: "back", type: "calisthenics", muscleGroups: ["lats", "core"], xpReward: 22 },
+  { name: "Typewriter Pull-Up", category: "back", type: "calisthenics", muscleGroups: ["lats", "biceps"], xpReward: 18 },
+  // ── CALISTHENICS: Legs ──
+  { name: "Bodyweight Squat", category: "legs", type: "calisthenics", muscleGroups: ["quadriceps", "glutes"], xpReward: 8 },
+  { name: "Jump Squat", category: "legs", type: "calisthenics", muscleGroups: ["quadriceps", "glutes", "calves"], xpReward: 12 },
+  { name: "Pistol Squat", category: "legs", type: "calisthenics", muscleGroups: ["quadriceps", "glutes", "balance"], xpReward: 20 },
+  { name: "Lunges", category: "legs", type: "calisthenics", muscleGroups: ["quadriceps", "glutes", "hamstrings"], xpReward: 10 },
+  { name: "Bulgarian Split Squat", category: "legs", type: "calisthenics", muscleGroups: ["quadriceps", "glutes"], xpReward: 14 },
+  { name: "Nordic Curl", category: "legs", type: "calisthenics", muscleGroups: ["hamstrings"], xpReward: 18 },
+  { name: "Glute Bridge", category: "legs", type: "calisthenics", muscleGroups: ["glutes", "hamstrings"], xpReward: 8 },
+  { name: "Single Leg Calf Raise", category: "legs", type: "calisthenics", muscleGroups: ["calves"], xpReward: 8 },
+  { name: "Step-Up", category: "legs", type: "calisthenics", muscleGroups: ["quadriceps", "glutes"], xpReward: 10 },
+  // ── CALISTHENICS: Shoulders ──
+  { name: "Handstand Push-Up", category: "shoulders", type: "calisthenics", muscleGroups: ["deltoids", "triceps"], xpReward: 22 },
+  { name: "Wall Handstand", category: "shoulders", type: "calisthenics", muscleGroups: ["deltoids", "core"], xpReward: 15 },
+  { name: "Decline Push-Up", category: "shoulders", type: "calisthenics", muscleGroups: ["upper chest", "shoulders"], xpReward: 10 },
+  { name: "Pike Hold", category: "shoulders", type: "calisthenics", muscleGroups: ["shoulders", "core"], xpReward: 10 },
+  // ── CALISTHENICS: Arms ──
+  { name: "Chin-Up Curl", category: "arms", type: "calisthenics", muscleGroups: ["biceps"], xpReward: 12 },
+  { name: "Ring Curl", category: "arms", type: "calisthenics", muscleGroups: ["biceps"], xpReward: 12 },
+  { name: "Tricep Dip", category: "arms", type: "calisthenics", muscleGroups: ["triceps", "chest"], xpReward: 12 },
+  { name: "Ring Dip", category: "arms", type: "calisthenics", muscleGroups: ["triceps", "chest", "stabilizers"], xpReward: 16 },
+  { name: "Close Grip Push-Up", category: "arms", type: "calisthenics", muscleGroups: ["triceps"], xpReward: 10 },
+  // ── CALISTHENICS: Core ──
+  { name: "Plank", category: "core", type: "calisthenics", muscleGroups: ["core", "lower back"], xpReward: 8 },
+  { name: "Side Plank", category: "core", type: "calisthenics", muscleGroups: ["obliques", "core"], xpReward: 8 },
+  { name: "Hollow Body Hold", category: "core", type: "calisthenics", muscleGroups: ["abs", "core"], xpReward: 12 },
+  { name: "L-Sit", category: "core", type: "calisthenics", muscleGroups: ["abs", "hip flexors", "triceps"], xpReward: 18 },
+  { name: "Dragon Flag", category: "core", type: "calisthenics", muscleGroups: ["abs", "core"], xpReward: 22 },
+  { name: "Hanging Leg Raise", category: "core", type: "calisthenics", muscleGroups: ["lower abs", "hip flexors"], xpReward: 14 },
+  { name: "Toes to Bar", category: "core", type: "calisthenics", muscleGroups: ["abs", "hip flexors", "lats"], xpReward: 16 },
+  { name: "Crunch", category: "core", type: "calisthenics", muscleGroups: ["abs"], xpReward: 6 },
+  { name: "Russian Twist", category: "core", type: "calisthenics", muscleGroups: ["obliques", "abs"], xpReward: 8 },
+  { name: "Mountain Climber", category: "core", type: "calisthenics", muscleGroups: ["core", "cardio"], xpReward: 10 },
+  { name: "V-Up", category: "core", type: "calisthenics", muscleGroups: ["abs", "hip flexors"], xpReward: 10 },
+  // ── CALISTHENICS: Cardio ──
+  { name: "Burpee", category: "cardio", type: "calisthenics", muscleGroups: ["full body", "cardiovascular"], xpReward: 14 },
+  { name: "Jump Rope", category: "cardio", type: "calisthenics", muscleGroups: ["cardiovascular", "calves"], xpReward: 10 },
+  { name: "Box Jump", category: "cardio", type: "calisthenics", muscleGroups: ["legs", "cardiovascular"], xpReward: 12 },
+  { name: "High Knees", category: "cardio", type: "calisthenics", muscleGroups: ["cardiovascular", "legs"], xpReward: 8 },
+  { name: "Running", category: "cardio", type: "calisthenics", muscleGroups: ["cardiovascular", "legs"], xpReward: 12 },
+  { name: "Bear Crawl", category: "cardio", type: "calisthenics", muscleGroups: ["full body", "core"], xpReward: 12 },
+  // ── CALISTHENICS: Skills ──
+  { name: "Handstand", category: "core", type: "calisthenics", muscleGroups: ["shoulders", "core", "balance"], xpReward: 20 },
+  { name: "Front Lever", category: "back", type: "calisthenics", muscleGroups: ["lats", "core", "rhomboids"], xpReward: 28 },
+  { name: "Back Lever", category: "back", type: "calisthenics", muscleGroups: ["biceps", "chest", "core"], xpReward: 26 },
+  { name: "Planche", category: "chest", type: "calisthenics", muscleGroups: ["pectorals", "shoulders", "core"], xpReward: 30 },
+  { name: "Human Flag", category: "core", type: "calisthenics", muscleGroups: ["obliques", "lats", "core"], xpReward: 30 },
 ];
 
 const seedAchievements = [
