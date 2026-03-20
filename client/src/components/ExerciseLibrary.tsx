@@ -72,7 +72,7 @@ export default function ExerciseLibrary({ onSelect, selectedIds = [], showSelect
   };
 
   return (
-    <div className="rpg-card p-4">
+    <div className="rpg-card p-4" style={{ position: "relative", zIndex: 1 }}>
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg" style={{ fontFamily: "var(--font-serif)" }}>📚 Exercise Library</h2>
         <button onClick={() => setShowAddForm(!showAddForm)}
@@ -199,7 +199,11 @@ export default function ExerciseLibrary({ onSelect, selectedIds = [], showSelect
               style={{
                 background: isSelected ? "hsl(43 85% 20% / 0.3)" : "hsl(var(--muted))",
                 border: `1px solid ${isSelected ? "hsl(43 85% 35%)" : "transparent"}`,
-              }}>
+                position: "relative",
+                zIndex: 1,
+                cursor: isSelected ? "default" : "pointer",
+              }}
+              onClick={() => !isSelected && onSelect && onSelect(ex)}>
               <span className="text-base flex-shrink-0">{CATEGORY_ICONS[ex.category] || "💪"}</span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1 flex-wrap">
