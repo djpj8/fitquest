@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../lib/api";
-import ExerciseLibrary from "../components/ExerciseLibrary";
-
-interface Exercise { id: number; name: string; category: string; type: string; xpReward: number; userId?: number | null; muscleGroups?: string[]; }
+import { CATEGORY_COLORS, CATEGORY_ICONS } from "../lib/utils";
+import ExerciseLibrary, { type Exercise } from "../components/ExerciseLibrary";
 interface SetEntry { reps: number; weight: number; completed: boolean; }
 interface WorkoutExercise { exercise: Exercise; sets: SetEntry[]; }
 
