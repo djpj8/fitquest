@@ -16,14 +16,23 @@ export interface UserProfile {
   createdAt: string;
 }
 
+async function fetchMe(): Promise<UserProfile | null> {
+  try {
+    const data: any = await api.get("/auth/me");
+    return data.user ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export function useAuth() {
   const qc = useQueryClient();
 
-  const { data: user, isLoading } = useQuery<UserProfile>({
+  const { data: user, isLoading } = useQuery<UserProfile | null>({
     queryKey: ["me"],
-    queryFn: () => api.get<UserProfile>("/auth/me").then((r: any) => r.user),
+    queryFn: fetchMe,
     retry: false,
-    staleTime: 0,
+    staleTime: 30_000,
   });
 
   const loginMutation = useMutation({
@@ -33,8 +42,13 @@ export function useAuth() {
   });
 
   const registerMutation = useMutation({
-    mutationFn: (data: { username: string; email: string; password: string; displayName?: string; avatarClass?: string }) =>
-      api.post<{ user: UserProfile }>("/auth/register", data),
+    mutationFn: (data: {
+      username: string;
+      email: string;
+      password: string;
+      displayName?: string;
+      avatarClass?: string;
+    }) => api.post<{ user: UserProfile }>("/auth/register", data),
     onSuccess: (data) => qc.setQueryData(["me"], data.user),
   });
 
