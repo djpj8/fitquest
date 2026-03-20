@@ -27,6 +27,7 @@ app.use("/api", routes);
 
 if (process.env.NODE_ENV === "production") {
   const distPath = path.resolve(process.cwd(), "dist/public");
+  console.log("Serving static from:", distPath);
   app.use(express.static(distPath));
   app.get("/{*path}", (_req, res) => {
     res.sendFile(path.join(distPath, "index.html"));
