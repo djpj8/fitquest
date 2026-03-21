@@ -10,6 +10,7 @@ const NAV: NavItem[] = [
   { id: "programs", icon: "📖", label: "Programs" },
   { id: "history", icon: "📜", label: "History" },
   { id: "achievements", icon: "🏆", label: "Achievements" },
+  { id: "profile", icon: "⚙️", label: "Profilo" },
 ];
 
 const CLASS_ICONS: Record<string, string> = { warrior: "⚔️", mage: "🔮", ranger: "🏹" };
