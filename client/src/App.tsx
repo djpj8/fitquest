@@ -7,9 +7,11 @@ import Routines from "./pages/Routines";
 import Programs from "./pages/Programs";
 import History from "./pages/History";
 import Achievements from "./pages/Achievements";
+import Profile from "./pages/Profile";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Sidebar from "./components/Sidebar";
 
-type Page = "dashboard" | "log-workout" | "routines" | "programs" | "history" | "achievements";
+type Page = "dashboard" | "log-workout" | "routines" | "programs" | "history" | "achievements" | "profile" | "privacy";
 
 export default function App() {
   const { user, isLoading } = useAuth();
@@ -38,6 +40,8 @@ export default function App() {
       case "programs": return <Programs />;
       case "history": return <History />;
       case "achievements": return <Achievements />;
+      case "profile": return <Profile onNavigate={p => setPage(p as Page)} />;
+      case "privacy": return <PrivacyPolicy onBack={() => setPage("profile")} />;
       default: return <Dashboard onNavigate={p => setPage(p as Page)} />;
     }
   };
