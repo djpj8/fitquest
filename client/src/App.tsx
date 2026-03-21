@@ -43,11 +43,18 @@ export default function App() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div style={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar currentPage={page} onNavigate={p => setPage(p as Page)} />
-      <main className="flex-1 overflow-y-auto min-h-screen">
-        {renderPage()}
+      <main style={{ flex: 1, overflowY: "auto", minHeight: "100vh" }}>
+        <div className="mobile-content-padding">
+          {renderPage()}
+        </div>
       </main>
+      <style>{`
+        @media (max-width: 768px) {
+          .mobile-content-padding { padding-top: 3.5rem; }
+        }
+      `}</style>
     </div>
   );
 }
