@@ -1,8 +1,9 @@
 import { Router, type Request, type Response } from "express";
 import { storage, getLevelFromTotalXp, xpForLevel, exerciseStorage } from "./storage";
 import { requireAuth, hashPassword } from "./auth";
-import { insertUserSchema, insertProgramSchema, insertRoutineSchema, insertWorkoutLogSchema } from "../shared/schema";
-import { z } from "zod";
+import { insertUserSchema, insertProgramSchema, insertRoutineSchema, insertWorkoutLogSchema, users, exercises, routines, programs, workoutLogs, userAchievements, favoriteExercises } from "../shared/schema";
+import { eq } from "drizzle-orm";
+import { db } from "./db";
 
 const router = Router();
 
@@ -49,8 +50,21 @@ router.post("/auth/login", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/auth/logout", (req: Request, res: Response) => {
-  req.session.destroy(() => res.json({ ok: true }));
+router.delete("/auth/account", requireAuth, async (req: Request, res: Response) => {
+  const userId = req.session.userId!;
+  try {
+    // Delete all user data in order
+    await db.delete(userAchievements).where(eq(userAchievements.userId, userId));
+    await db.delete(workoutLogs).where(eq(workoutLogs.userId, userId));
+    await db.delete(favoriteExercises).where(eq(favoriteExercises.userId, userId));
+    await db.delete(exercises).where(eq(exercises.userId, userId));
+    await db.delete(routines).where(eq(routines.userId, userId));
+    await db.delete(programs).where(eq(programs.userId, userId));
+    await db.delete(users).where(eq(users.id, userId));
+    req.session.destroy(() => res.json({ ok: true }));
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 router.get("/auth/me", requireAuth, async (req: Request, res: Response) => {
