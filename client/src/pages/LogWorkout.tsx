@@ -3,7 +3,15 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../lib/api";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../lib/utils";
 import ExerciseLibrary, { type Exercise } from "../components/ExerciseLibrary";
-interface SetEntry { reps: number; weight: number; completed: boolean; }
+
+const STATIC_EXERCISES = new Set([
+  "plank", "side plank", "hollow body hold", "l-sit", "pike hold",
+  "wall handstand", "handstand", "front lever", "back lever", "planche",
+  "human flag", "dead hang",
+]);
+const isStatic = (name: string) => STATIC_EXERCISES.has(name.toLowerCase());
+
+interface SetEntry { reps: number; seconds: number; weight: number; completed: boolean; }
 interface WorkoutExercise { exercise: Exercise; sets: SetEntry[]; }
 
 interface XPResult { log: any; user: any; xpEarned: number; newAchievements: string[]; }
@@ -21,12 +29,12 @@ export default function LogWorkout({ onNavigate }: { onNavigate: (p: string) => 
 
   const addExercise = (ex: Exercise) => {
     if (workoutExercises.find(w => w.exercise.id === ex.id)) return;
-    setWorkoutExercises(p => [...p, { exercise: ex, sets: [{ reps: 10, weight: 0, completed: false }] }]);
+    setWorkoutExercises(p => [...p, { exercise: ex, sets: [{ reps: 10, seconds: 30, weight: 0, completed: false }] }]);
   };
 
   const addSet = (exIdx: number) => {
     setWorkoutExercises(p => p.map((w, i) => i === exIdx
-      ? { ...w, sets: [...w.sets, { reps: w.sets[w.sets.length - 1]?.reps || 10, weight: w.sets[w.sets.length - 1]?.weight || 0, completed: false }] }
+      ? { ...w, sets: [...w.sets, { ...w.sets[w.sets.length - 1], completed: false }] }
       : w
     ));
   };
@@ -194,15 +202,20 @@ export default function LogWorkout({ onNavigate }: { onNavigate: (p: string) => 
 
                   <div className="space-y-2">
                     <div className="grid grid-cols-4 gap-2 text-xs mb-1" style={{ color: "hsl(var(--muted-foreground))", fontFamily: "var(--font-mono)" }}>
-                      <span>SET</span><span>REPS</span><span>KG</span><span>DONE</span>
+                      <span>SET</span>
+                      <span>{isStatic(we.exercise.name) ? "SEC" : "REPS"}</span>
+                      <span>KG</span>
+                      <span>DONE</span>
                     </div>
                     {we.sets.map((set, setIdx) => (
                       <div key={setIdx} className="grid grid-cols-4 gap-2 items-center">
                         <span className="text-sm text-center" style={{ fontFamily: "var(--font-mono)", color: "hsl(var(--muted-foreground))" }}>
                           {setIdx + 1}
                         </span>
-                        <input type="number" min="1" value={set.reps}
-                          onChange={e => updateSet(exIdx, setIdx, "reps", +e.target.value)}
+                        <input
+                          type="number" min="1"
+                          value={isStatic(we.exercise.name) ? set.seconds : set.reps}
+                          onChange={e => updateSet(exIdx, setIdx, isStatic(we.exercise.name) ? "seconds" : "reps", +e.target.value)}
                           className="w-full px-2 py-1 rounded text-sm text-center outline-none"
                           style={{ background: "hsl(var(--input))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }}
                         />
@@ -225,7 +238,7 @@ export default function LogWorkout({ onNavigate }: { onNavigate: (p: string) => 
                     ))}
                     <button onClick={() => addSet(exIdx)}
                       className="text-xs mt-1 transition-all"
-                      style={{ color: "hsl(var(--primary))" }}>
+                      style={{ color: "hsl(var(--primary))", background: "none", border: "none", cursor: "pointer" }}>
                       + Add set
                     </button>
                   </div>
