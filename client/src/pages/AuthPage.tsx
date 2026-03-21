@@ -204,6 +204,17 @@ export default function AuthPage() {
             </button>
           </form>
         </div>
+
+        {/* Footer */}
+        <div className="text-center mt-4" style={{ fontSize: "0.75rem", color: "hsl(var(--muted-foreground))" }}>
+          Registrandoti accetti la nostra{" "}
+          <a href="#privacy" onClick={e => { e.preventDefault(); alert("Vai su Profilo → Privacy Policy dopo aver fatto login."); }}
+            style={{ color: "hsl(var(--primary))", textDecoration: "underline" }}>
+            Privacy Policy
+          </a>
+          {" "}· Contatti:{" "}
+          <a href="mailto:djpj8.09@gmail.com" style={{ color: "hsl(var(--primary))" }}>djpj8.09@gmail.com</a>
+        </div>
       </div>
     </div>
   );
