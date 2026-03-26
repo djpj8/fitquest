@@ -7,7 +7,7 @@ import ExerciseLibrary from "../components/ExerciseLibrary";
 interface Exercise { id: number; name: string; category: string; type: string; xpReward: number; userId?: number | null; muscleGroups?: string[]; }
 interface RoutineExercise { exerciseId: number; sets: number; reps: number; weight: number; restSeconds: number; }
 
-export default function Routines() {
+export default function Routines({ onNavigate }: { onNavigate?: (page: string, routineId?: number) => void }) {
   const qc = useQueryClient();
   const { data: routines = [] } = useQuery<any[]>({ queryKey: ["routines"], queryFn: () => api.get("/routines") });
   const { data: exercises = [] } = useQuery<Exercise[]>({ queryKey: ["exercises"], queryFn: () => api.get("/exercises") });
@@ -184,16 +184,25 @@ export default function Routines() {
                 )}
               </div>
               <div className="flex gap-2">
+                <button onClick={() => onNavigate && onNavigate("log-workout", r.id)}
+                  className="flex-1 py-1.5 rounded-lg text-xs font-bold transition-all"
+                  style={{
+                    background: "linear-gradient(135deg, hsl(43 85% 45%), hsl(43 85% 60%))",
+                    color: "hsl(220 20% 6%)", border: "none",
+                    fontFamily: "var(--font-serif)", cursor: "pointer",
+                  }}>
+                  ⚔️ Inizia
+                </button>
                 <button onClick={() => startEdit(r)}
-                  className="flex-1 py-1.5 rounded-lg text-xs transition-all"
-                  style={{ border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }}
+                  className="py-1.5 px-3 rounded-lg text-xs transition-all"
+                  style={{ border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))", cursor: "pointer", background: "none" }}
                   onMouseEnter={e => e.currentTarget.style.borderColor = "hsl(var(--primary))"}
                   onMouseLeave={e => e.currentTarget.style.borderColor = "hsl(var(--border))"}>
-                  ✏️ Edit
+                  ✏️
                 </button>
                 <button onClick={() => deleteMutation.mutate(r.id)}
                   className="py-1.5 px-3 rounded-lg text-xs transition-all"
-                  style={{ border: "1px solid hsl(var(--destructive-border))", color: "hsl(var(--destructive))" }}>
+                  style={{ border: "1px solid hsl(var(--destructive-border))", color: "hsl(var(--destructive))", cursor: "pointer", background: "none" }}>
                   🗑️
                 </button>
               </div>

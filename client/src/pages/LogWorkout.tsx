@@ -5,9 +5,14 @@ import { CATEGORY_COLORS, CATEGORY_ICONS } from "../lib/utils";
 import ExerciseLibrary, { type Exercise } from "../components/ExerciseLibrary";
 
 const STATIC_EXERCISES = new Set([
-  "plank", "side plank", "hollow body hold", "l-sit", "pike hold",
-  "wall handstand", "handstand", "front lever", "back lever", "planche",
-  "human flag", "dead hang",
+  // Plank variations
+  "plank", "side plank",
+  // Hold exercises
+  "hollow body hold", "l-sit", "pike hold", "dead hang",
+  // Handstand holds
+  "wall handstand", "handstand",
+  // Advanced statics
+  "front lever", "back lever", "planche", "human flag",
 ]);
 const isStatic = (name: string) => STATIC_EXERCISES.has(name.toLowerCase());
 
@@ -16,16 +21,18 @@ interface WorkoutExercise { exercise: Exercise; sets: SetEntry[]; }
 
 interface XPResult { log: any; user: any; xpEarned: number; newAchievements: string[]; }
 
-export default function LogWorkout({ onNavigate }: { onNavigate: (p: string) => void }) {
+export default function LogWorkout({ onNavigate, initialRoutineId }: { onNavigate: (p: string) => void; initialRoutineId?: number }) {
   const qc = useQueryClient();
   const { data: exercises = [] } = useQuery<Exercise[]>({ queryKey: ["exercises"], queryFn: () => api.get("/exercises") });
   const { data: routines = [] } = useQuery<any[]>({ queryKey: ["routines"], queryFn: () => api.get("/routines") });
 
-  const [workoutName, setWorkoutName] = useState(`Quest — ${new Date().toLocaleDateString("en", { month: "short", day: "numeric" })}`);
+  const getDefaultName = () => `Quest — ${new Date().toLocaleDateString("en", { month: "short", day: "numeric" })}`;
+  const [workoutName, setWorkoutName] = useState(getDefaultName());
   const [workoutExercises, setWorkoutExercises] = useState<WorkoutExercise[]>([]);
   const [startTime] = useState(Date.now());
   const [result, setResult] = useState<XPResult | null>(null);
   const [notes, setNotes] = useState("");
+  const [routineLoaded, setRoutineLoaded] = useState(false);
 
   const addExercise = (ex: Exercise) => {
     if (workoutExercises.find(w => w.exercise.id === ex.id)) return;
@@ -77,14 +84,27 @@ export default function LogWorkout({ onNavigate }: { onNavigate: (p: string) => 
     const loaded: WorkoutExercise[] = (routine.exercises || []).map((re: any) => {
       const ex = exMap.get(re.exerciseId);
       if (!ex) return null;
+      const staticEx = isStatic(ex.name);
       return {
         exercise: ex,
-        sets: Array.from({ length: re.sets || 3 }, () => ({ reps: re.reps || 10, weight: re.weight || 0, completed: false }))
+        sets: Array.from({ length: re.sets || 3 }, () => ({
+          reps: staticEx ? 1 : (re.reps || 10),
+          seconds: staticEx ? 30 : 0,
+          weight: re.weight || 0,
+          completed: false,
+        }))
       };
     }).filter(Boolean);
-    setWorkoutExercises(loaded);
+    setWorkoutExercises(loaded as WorkoutExercise[]);
     setWorkoutName(routine.name);
+    setRoutineLoaded(true);
   };
+
+  // Auto-load routine when exercises/routines are ready
+  if (initialRoutineId && !routineLoaded && exercises.length > 0 && routines.length > 0) {
+    const routine = (routines as any[]).find(r => r.id === initialRoutineId);
+    if (routine) loadRoutine(routine);
+  }
 
   if (result) {
     return (
@@ -156,21 +176,38 @@ export default function LogWorkout({ onNavigate }: { onNavigate: (p: string) => 
           {/* Load routine */}
           {routines.length > 0 && (
             <div className="rpg-card p-4">
-              <label className="block text-xs mb-2" style={{ fontFamily: "var(--font-serif)", color: "hsl(var(--primary))", letterSpacing: "0.1em" }}>
-                LOAD ROUTINE
+              <label className="block text-xs mb-3" style={{ fontFamily: "var(--font-serif)", color: "hsl(var(--primary))", letterSpacing: "0.1em" }}>
+                📋 CARICA ROUTINE
               </label>
-              <div className="flex gap-2 flex-wrap">
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "0.5rem" }}>
                 {routines.map((r: any) => (
                   <button key={r.id} onClick={() => loadRoutine(r)}
-                    className="px-3 py-1 rounded-full text-xs transition-all"
-                    style={{ background: "hsl(var(--muted))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "hsl(var(--primary))"; e.currentTarget.style.color = "hsl(var(--primary))"; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "hsl(var(--border))"; e.currentTarget.style.color = "hsl(var(--foreground))"; }}
-                  >
-                    📋 {r.name}
+                    style={{
+                      padding: "0.625rem 0.75rem",
+                      borderRadius: "0.5rem",
+                      border: `1px solid ${workoutName === r.name ? "hsl(var(--primary))" : "hsl(var(--border))"}`,
+                      background: workoutName === r.name ? "hsl(43 85% 20% / 0.4)" : "hsl(var(--muted))",
+                      color: workoutName === r.name ? "hsl(var(--primary))" : "hsl(var(--foreground))",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      fontSize: "0.8rem",
+                      fontWeight: workoutName === r.name ? "bold" : "normal",
+                      fontFamily: workoutName === r.name ? "var(--font-serif)" : "inherit",
+                      display: "flex", alignItems: "center", gap: "0.375rem",
+                      boxShadow: workoutName === r.name ? "0 0 10px hsl(43 85% 30% / 0.3)" : "none",
+                    }}>
+                    <span>{workoutName === r.name ? "✓" : "📋"}</span>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.name}</span>
                   </button>
                 ))}
               </div>
+              {workoutName !== `Quest — ${new Date().toLocaleDateString("en", { month: "short", day: "numeric" })}` && (
+                <button
+                  onClick={() => { setWorkoutExercises([]); setWorkoutName(`Quest — ${new Date().toLocaleDateString("en", { month: "short", day: "numeric" })}`); }}
+                  style={{ marginTop: "0.5rem", fontSize: "0.75rem", color: "hsl(var(--muted-foreground))", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                  ✕ Svuota workout
+                </button>
+              )}
             </div>
           )}
 
