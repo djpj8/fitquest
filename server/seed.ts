@@ -1,5 +1,7 @@
 import { db } from "./db";
 import { exercises, achievements } from "../shared/schema";
+import { eq, and, isNull } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 const seedExercises = [
   // ── GYM: Chest ──
@@ -121,25 +123,37 @@ const seedAchievements = [
 ];
 
 export async function seed() {
-  // Only seed if tables are empty
-  const existingExercises = await db.select().from(exercises).limit(1);
-  if (existingExercises.length === 0) {
-    console.log("Seeding exercises...");
-    for (const ex of seedExercises) {
+  // Remove duplicates already in DB (keep lowest id per name)
+  await db.execute(sql`
+    DELETE FROM exercises
+    WHERE id NOT IN (
+      SELECT MIN(id) FROM exercises
+      WHERE user_id IS NULL
+      GROUP BY name
+    )
+    AND user_id IS NULL
+  `);
+
+  // Insert only missing exercises
+  console.log("Seeding exercises...");
+  for (const ex of seedExercises) {
+    const existing = await db.select().from(exercises)
+      .where(and(eq(exercises.name, ex.name), isNull(exercises.userId)))
+      .limit(1);
+    if (existing.length === 0) {
       await db.insert(exercises).values(ex);
     }
-  } else {
-    console.log("Exercises already seeded, skipping.");
   }
 
-  const existingAchievements = await db.select().from(achievements).limit(1);
-  if (existingAchievements.length === 0) {
-    console.log("Seeding achievements...");
-    for (const ach of seedAchievements) {
+  // Insert only missing achievements
+  console.log("Seeding achievements...");
+  for (const ach of seedAchievements) {
+    const existing = await db.select().from(achievements)
+      .where(eq(achievements.key, ach.key))
+      .limit(1);
+    if (existing.length === 0) {
       await db.insert(achievements).values(ach);
     }
-  } else {
-    console.log("Achievements already seeded, skipping.");
   }
 
   console.log("Seed complete!");
