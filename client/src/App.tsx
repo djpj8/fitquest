@@ -16,6 +16,13 @@ type Page = "dashboard" | "log-workout" | "routines" | "programs" | "history" | 
 export default function App() {
   const { user, isLoading } = useAuth();
   const [page, setPage] = useState<Page>("dashboard");
+  const [activeRoutineId, setActiveRoutineId] = useState<number | undefined>(undefined);
+
+  const handleNavigate = (p: string, routineId?: number) => {
+    setPage(p as Page);
+    if (routineId !== undefined) setActiveRoutineId(routineId);
+    else setActiveRoutineId(undefined);
+  };
 
   if (isLoading) {
     return (
@@ -34,21 +41,21 @@ export default function App() {
 
   const renderPage = () => {
     switch (page) {
-      case "dashboard": return <Dashboard onNavigate={p => setPage(p as Page)} />;
-      case "log-workout": return <LogWorkout onNavigate={p => setPage(p as Page)} />;
-      case "routines": return <Routines />;
+      case "dashboard": return <Dashboard onNavigate={handleNavigate} />;
+      case "log-workout": return <LogWorkout onNavigate={handleNavigate} initialRoutineId={activeRoutineId} />;
+      case "routines": return <Routines onNavigate={handleNavigate} />;
       case "programs": return <Programs />;
       case "history": return <History />;
       case "achievements": return <Achievements />;
-      case "profile": return <Profile onNavigate={p => setPage(p as Page)} />;
+      case "profile": return <Profile onNavigate={handleNavigate} />;
       case "privacy": return <PrivacyPolicy onBack={() => setPage("profile")} />;
-      default: return <Dashboard onNavigate={p => setPage(p as Page)} />;
+      default: return <Dashboard onNavigate={handleNavigate} />;
     }
   };
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
-      <Sidebar currentPage={page} onNavigate={p => setPage(p as Page)} />
+      <Sidebar currentPage={page} onNavigate={handleNavigate} />
       <main style={{ flex: 1, overflowY: "auto", minHeight: "100vh" }}>
         <div className="mobile-content-padding">
           {renderPage()}
