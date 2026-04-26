@@ -1,0 +1,9 @@
+# Koyeb deployment configuration
+# This file is used by Koyeb to deploy the application
+
+build:
+  type: buildpack
+  builder: heroku/builder:24
+
+run:
+  command: node dist/index.cjs
